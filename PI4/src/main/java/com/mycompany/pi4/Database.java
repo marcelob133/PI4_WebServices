@@ -17,7 +17,7 @@ public class Database {
     
     public Connection conn () throws Exception {
         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        Connection conn = DriverManager.getConnection("jdbc:sqlserver://pijulio.database.windows.net:1433;user=julio@pijulio;password=Abcd123!;database=facenac");
+        Connection conn = DriverManager.getConnection("jdbc:sqlserver://pijulio.database.windows.net:1433;user=julio@pijulio.database.windows.net;password=Abcd123!;database=facenac");
         return conn;
     }
 }
