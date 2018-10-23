@@ -3,21 +3,29 @@ package com.mycompany.pi4;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class Database {
+public class Program {
     
-    private static Database instance = null;
+    try{
+        String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDrive";
+        String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
+        String USER = "Abcd123!";
+        String PASS = "julio@pijulio.database.windows.net";
     
-    private Database(){};
-    
-    public static Database get () {
-        if(instance == null)
-            instance = new Database();
-        return instance;
-    }
-    
-    public Connection conn () throws Exception {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        Connection conn = DriverManager.getConnection("jdbc:sqlserver://pijulio.database.windows.net:1433;user=julio@pijulio.database.windows.net;password=Abcd123!;database=facenac");
-        return conn;
+        Class.forName(DRIVER);
+        Connection conn = DriverManager.getConnection(URL, USER, PASS);
+        PrepareStatement stmt = conn.prepareStatement("select * from usuario order by name");
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next()){
+            Long id = rs.getLong("id"); 
+            String nome = rs.getString("nome");
+            String email = rs.getString("email");
+            String senha = rs.getString("senha");
+            byte[] foto = rs.getBytes("foto");
+        }
+        
+    }catch(ClassNotFoundException ex){
+        System.out.println(ex.getMessage());    
+    }catch(SQLException ex){
+        System.out.println(ex.getMessage());
     }
 }
