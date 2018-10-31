@@ -10,12 +10,12 @@ public class Users implements Serializable {
     private String nome;
     private String email;
     private String senha;
-    private byte[] foto;
+    private String foto;
 
     protected Users() {
     }
 
-    public Users(Long id, String nome, String email, String senha, byte[] foto) {
+    public Users(Long id, String nome, String email, String senha, String foto) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -39,7 +39,7 @@ public class Users implements Serializable {
         return senha;
     }
 
-    public byte[] getFoto() {
+    public String getFoto() {
         return foto;
     }
 
