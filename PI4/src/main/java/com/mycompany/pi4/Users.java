@@ -1,64 +1,46 @@
 package com.mycompany.pi4;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.GET;
+import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+@XmlRootElement
+public class Users implements Serializable {
 
-@Path("/users")
-public class Users {
-    
-    private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
-    private static final String USER = "julio@pijulio";
-    private static final String PASS = "Abcd123!";
-   
-   @GET
-   @Path("/{id}")
-   @Produces("application/json;charset=utf-8")
-   public Response getUser (@PathParam("id") Long idUser) {
-        Response response;
+    private Long id;
+    private String nome;
+    private String email;
+    private String senha;
+    private String foto;
 
-        try {
-            Class.forName(DRIVER);
-            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
-                
-                if (idUser == 0) {
-                    return Response.status(Response.Status.BAD_REQUEST).build();
-                }
-                
-                stmt.setLong(1, idUser);
-                ResultSet rs = stmt.executeQuery();
-                
-                List<Usuarios> usuariosList = new ArrayList<>();
-                
-                while (rs.next()) {
-                    Long id = rs.getLong("id");
-                    String nome = rs.getString("nome");
-                    String email = rs.getString("email");
-                    String senha = rs.getString("senha");
-                    byte[] foto = rs.getBytes("foto");
+    protected Users() {
+    }
 
-                    Usuarios usuario = new Usuarios(id, nome, email, senha, foto);
-                    usuariosList.add(usuario);
-                }
-                response = Response.ok(usuariosList).build();
-            }
-        } catch (ClassNotFoundException | SQLException ex) {
-            response = Response.serverError().entity(ex.getMessage()).build();
-        }
+    public Users(Long id, String nome, String email, String senha, String foto) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.foto = foto;
+    }
 
-        return response;
-   }
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
 }
