@@ -22,11 +22,11 @@ public class LoginService {
     private static final String PASS = "Abcd123!";
     
    @POST   
-   @Consumes("application/json;charset=utf-8")   
+   @Consumes("application/json")   
    @Produces("application/json;charset=utf-8")   
    public Response isAutorizado (Login login) throws SQLException {
         Response response;
-        boolean autorizado = false;
+        Long id = null;
                
         try{
             Class.forName(DRIVER);
@@ -38,13 +38,23 @@ public class LoginService {
                 stmt.setString(2, login.getSenha());
                 try(ResultSet rs = stmt.executeQuery()){
                     if(rs.next()){
-                       autorizado = true;
-                    }                    
+                       id = rs.getLong("id");
+                       String nome = rs.getString("nome");
+                       String email = rs.getString("email");
+                       String senha = rs.getString("senha");
+                       String foto = rs.getString("foto");
+                       
+                       Users usuario = new Users(id, nome, email, senha, foto);
+                       response = Response.ok(usuario).build();
+                    } else{
+                        response = Response.serverError().entity("ERRO: true").build();
+                    }                  
                 }
-            }
-            response = Response.ok(autorizado).build();
+            } catch(SQLException ex){
+                response = Response.serverError().entity("ERRO: "+ex.getMessage()).build();
+            }          
           
-        }catch(ClassNotFoundException | SQLException ex){
+        }catch(ClassNotFoundException ex){
             response = Response.serverError().entity("ERRO: "+ex.getMessage()).build();
         }
         return response;    

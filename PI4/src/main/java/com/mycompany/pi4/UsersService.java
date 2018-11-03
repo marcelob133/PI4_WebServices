@@ -37,7 +37,7 @@ public class UsersService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
+                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
