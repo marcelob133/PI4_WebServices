@@ -13,6 +13,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -27,10 +28,11 @@ public class PostsService {
     private static final String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
-   @POST
-   @Consumes("application/json;charset=utf-8")   
-   @Produces("application/json;charset=utf-8")
-   public Response setHistoria (Posts post) throws SQLException {
+   
+    @POST
+    @Consumes("application/json;charset=utf-8")   
+    @Produces("application/json;charset=utf-8")
+    public Response setHistoria (Posts post) throws SQLException {
         Response response;
         Long postCriado = null;
         
@@ -46,10 +48,7 @@ public class PostsService {
         
                 String foto = post.getFoto();
                 byte[] fotoEmByte = Base64.getDecoder().decode (foto);
-                stmt.setBytes(3, fotoEmByte);
-                
-              //  Timestamp t = new Timestamp(System.currentTimeMillis());
-                //stmt.setTimestamp(4, t);
+                stmt.setBytes(3, fotoEmByte);            
                 
                 java.sql.Date d = new java.sql.Date (new java.util.Date().getTime());
                 stmt.setDate (4,d);
@@ -69,5 +68,34 @@ public class PostsService {
         }
         
         return response;
-   }
+    }
+    
+    @DELETE
+    @Path("/{id}")
+    @Produces("text/plain")
+    public Response deletePost(@PathParam("id") Long id) {
+        Response response;
+        
+        try {
+            Class.forName(DRIVER);
+            String sql = "DELETE FROM historia WHERE id = ?";
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                    PreparedStatement stmt = conn.prepareStatement(sql)) {
+                
+                if (id == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, id);
+                
+                int rs = stmt.executeUpdate();
+                  
+                response = Response.ok("Post excluído com sucesso!").build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+        
+        return response;
+    }
 }
