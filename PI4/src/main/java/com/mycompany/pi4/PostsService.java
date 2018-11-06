@@ -88,9 +88,12 @@ public class PostsService {
                 
                 stmt.setLong(1, id);
                 
-                int rs = stmt.executeUpdate();
-                  
-                response = Response.ok("Post excluído com sucesso!").build();
+                try{
+                    ResultSet rs = stmt.executeQuery();
+                    response = Response.ok("Post excluido com sucesso!").build();
+                }catch(SQLException ex){
+                    response = Response.serverError().entity(ex.getMessage()).build();
+                }
             }
         } catch (ClassNotFoundException | SQLException ex) {
             response = Response.serverError().entity(ex.getMessage()).build();
