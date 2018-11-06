@@ -1,0 +1,7 @@
+com\mycompany\pi4\Login.class
+org\netbeans\rest\application\config\ApplicationConfig.class
+com\mycompany\pi4\PostsService.class
+com\mycompany\pi4\Users.class
+com\mycompany\pi4\Posts.class
+com\mycompany\pi4\UsersService.class
+com\mycompany\pi4\LoginService.class

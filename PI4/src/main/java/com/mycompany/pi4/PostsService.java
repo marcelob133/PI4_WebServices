@@ -20,14 +20,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/historia")
+@Path("/posts")
 public class PostsService {
     
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
-    
    @POST
    @Consumes("application/json;charset=utf-8")   
    @Produces("application/json;charset=utf-8")
@@ -37,7 +36,7 @@ public class PostsService {
         
         try {
             Class.forName(DRIVER);
-            String sql = "INSERT INTO historico (usuario,texto,foto,data) VALUES (?,?,?,?)";
+            String sql = "INSERT INTO historia (usuario,texto,foto,data) VALUES (?,?,?,?)";
             
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -49,8 +48,11 @@ public class PostsService {
                 byte[] fotoEmByte = Base64.getDecoder().decode (foto);
                 stmt.setBytes(3, fotoEmByte);
                 
-                Timestamp t = new Timestamp(System.currentTimeMillis());
-                stmt.setTimestamp(4, t);
+              //  Timestamp t = new Timestamp(System.currentTimeMillis());
+                //stmt.setTimestamp(4, t);
+                
+                java.sql.Date d = new java.sql.Date (new java.util.Date().getTime());
+                stmt.setDate (4,d);
                 
                 int rs = stmt.executeUpdate();
                 
