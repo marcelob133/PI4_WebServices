@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -27,7 +26,7 @@ public class FriendsService {
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
     
-    @GET//ALGO DE ERRADO NAO ESTÁ CERTO
+    @GET
     @Path("/{id}")
     @Produces("application/json;charset=utf-8")
        public Response getAmigos (@PathParam("id") Long idUser) {
@@ -36,9 +35,9 @@ public class FriendsService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("u.nome, a.usuario1, a.usuario2, a.aprovada "
+                PreparedStatement stmt = conn.prepareStatement("select u.nome, a.usuario1, a.usuario2, a.aprovada "
                                                                + "from Amizade a inner join Usuario u on a.usuario1 = u.id " +
-                                                               "where a.aprovada = 0 and a.usuario2 = ? ;")) {
+                                                               "where a.usuario2 = ? ;")) {
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
@@ -46,7 +45,7 @@ public class FriendsService {
                 stmt.setLong(1, idUser);
                 ResultSet rs = stmt.executeQuery();
                 
-                List<Friend> amizadesList = new ArrayList<>();
+                List<FriendList> amizadesList = new ArrayList<>();
                 
                 while (rs.next()) {
                     String nome = rs.getString("u.nome");
@@ -54,7 +53,13 @@ public class FriendsService {
                     Long idUsuario2 = rs.getLong("a.usuario2");
                     Boolean aprovada = rs.getBoolean("a.aprovada");
                     
-                    Friend amizade = new Friend(nome, idUsuario1, idUsuario2, aprovada);
+                    FriendList amizade = new FriendList(nome, idUsuario1, idUsuario2, aprovada);
+                    
+                    amizade.setNome(nome);
+                    amizade.setUsuario1(idUsuario1);
+                    amizade.setUsuario2(idUsuario2);
+                    amizade.setAprovado(aprovada);
+                    
                     amizadesList.add(amizade);
                 }
                 response = Response.ok(amizadesList).build();
@@ -67,52 +72,37 @@ public class FriendsService {
    }
     
     
-    @POST//APARENTEMENTE EXISTE ALGUM PROBLEMA NO CONSTRUCTOR DA CLASSE FRIENDS
+    @POST
     @Consumes("application/json;charset=utf-8")   
     @Produces("application/json;charset=utf-8")
-    public Response setAmizade (NewFriend friend) throws SQLException, ClassNotFoundException {
+    public Response setAmizade (Friend friend) throws SQLException, ClassNotFoundException {
         Response response;
         
         Class.forName(DRIVER);
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-            PreparedStatement stmt = conn.prepareStatement("select * from amizade where (usuario1 = ? and usuario2 = ?) or (usuario2 = ? and usuario1 = ?)")) {
+        String sql = "INSERT INTO amizade (usuario1,usuario2,aprovada) VALUES (?,?,?)";
             
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                
             stmt.setLong(1, friend.getUsuario1());
             stmt.setLong(2, friend.getUsuario2());
-            stmt.setLong(3, friend.getUsuario2());
-            stmt.setLong(4, friend.getUsuario1());
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                response = Response.ok("Amizade já existe").build();
-                return response;
-            }
-        } catch(SQLException ex){
-            response = Response.serverError().entity("ERRO: "+ex.getMessage()).build();
-        }
-        try {
-            Class.forName(DRIVER);
-            String sql = "INSERT INTO amizade (usuario1,usuario2,aprovada) VALUES (?,?,?)";
-            
-            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setBoolean(3, false);
                 
-                stmt.setLong(1, friend.getUsuario1());
-                stmt.setLong(2, friend.getUsuario2());
-                stmt.setBoolean(3, false);
-                
-                int rs = stmt.executeUpdate();
-                
+            int rs = stmt.executeUpdate();
+            if(rs != 0){
                 response = Response.ok("Amizade solicitada!").build();
-            }
-        } catch (ClassNotFoundException | SQLException ex) {
+            }else{
+                response = Response.serverError().entity("ERRO NO CADASTRO DE AMIZADE").build();
+            }   
+            
+        } catch (SQLException ex) {
             response = Response.serverError().entity("ERRO NO CADASTRO DE AMIZADE: "+ex.getMessage()).build();
         }
         
         return response;
     }
     
-    @DELETE //PRECISA ARRUMAR O TEXTO DE RETORNO PARA O FRONT QUANDO OCORRE TUDO OK!
+    @DELETE
     @Path("/{idUsuario}/{idAmigo}")
     @Produces("application/json;charset=utf-8")
        public Response deleteAmigo (@PathParam("idUsuario") Long idUsuario, @PathParam("idAmigo") Long idAmigo) {
@@ -129,7 +119,7 @@ public class FriendsService {
                 stmt.setLong(1, idAmigo);
                 stmt.setLong(2, idUsuario);
                 try{
-                    ResultSet rs = stmt.executeQuery();
+                    stmt.executeUpdate();
                     response = Response.ok("Amizade desfeita com sucesso!").build();
                 }catch(SQLException ex){
                     response = Response.serverError().entity(ex.getMessage()).build();
