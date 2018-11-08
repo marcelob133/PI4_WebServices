@@ -71,17 +71,17 @@ public class PostsService {
     }
     
     @DELETE
-    @Path("/{id}")
+    @Path("/delete/{id}")
     @Produces("application/json;charset=utf-8")
     public Response deletePost(@PathParam("id") Long id) {
-        Response response;
+        Response response = null;
         
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("DELETE FROM historia WHERE id = ?")) {
+                    PreparedStatement stmt = conn.prepareStatement("delete from historia where id = ?")) {
                 
-                if (id == 0) {
+                if (id == 0 || id == null) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
                 
