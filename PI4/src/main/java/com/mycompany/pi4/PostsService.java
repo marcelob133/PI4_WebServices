@@ -71,7 +71,7 @@ public class PostsService {
     }
     
     @DELETE
-    @Path("/delete/{id}")
+    @Path("/{id}")
     @Produces("application/json;charset=utf-8")
     public Response deletePost(@PathParam("id") Long id) {
         Response response = null;
