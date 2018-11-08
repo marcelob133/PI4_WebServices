@@ -72,15 +72,14 @@ public class PostsService {
     
     @DELETE
     @Path("/{id}")
-    @Produces("text/plain")
+    @Produces("application/json;charset=utf-8")
     public Response deletePost(@PathParam("id") Long id) {
         Response response;
         
         try {
             Class.forName(DRIVER);
-            String sql = "DELETE FROM historia WHERE id = ?";
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement(sql)) {
+                    PreparedStatement stmt = conn.prepareStatement("DELETE FROM historia WHERE id = ?")) {
                 
                 if (id == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -89,13 +88,15 @@ public class PostsService {
                 stmt.setLong(1, id);
                 
                 try{
-                    ResultSet rs = stmt.executeQuery();
-                    response = Response.ok("Post excluido com sucesso!").build();
+                    stmt.executeUpdate();
+                    response = Response.ok("Postagem excluida com sucesso!").build();
                 }catch(SQLException ex){
                     response = Response.serverError().entity(ex.getMessage()).build();
                 }
+            }catch(SQLException ex){
+                response = Response.serverError().entity(ex.getMessage()).build();
             }
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (ClassNotFoundException ex) {
             response = Response.serverError().entity(ex.getMessage()).build();
         }
         
