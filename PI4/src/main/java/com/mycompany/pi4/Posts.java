@@ -2,6 +2,7 @@ package com.mycompany.pi4;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.sql.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -11,7 +12,15 @@ public class Posts {
     private Long usuario;
     private String texto;
     private String foto;
-    private Timestamp data;
+    private Date data;
+    
+    public Posts(Long id, Long usuario, String texto, String foto, Date data) {
+        this.id = id;
+        this.usuario = usuario;
+        this.texto = texto;
+        this.foto = foto;
+        this.data = data;
+    }
 
     public Long getId() {
         return id;
@@ -29,7 +38,7 @@ public class Posts {
         return foto;
     }
 
-    public Timestamp getData() {
+    public Date getData() {
         return data;
     }
     

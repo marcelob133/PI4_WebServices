@@ -1,6 +1,7 @@
 package com.mycompany.pi4;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +30,47 @@ public class PostsService {
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
    
+    
+    @GET
+    @Path("/{id}")  
+    @Produces("application/json;charset=utf-8")
+    public Response getHistoriaPessoais (@PathParam("id") Long idUser) throws SQLException {
+        Response response;
+
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                    PreparedStatement stmt = conn.prepareStatement("select * from historia where usuario = ?")) {
+                
+                if (idUser == 0 || idUser == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idUser);
+                ResultSet rs = stmt.executeQuery();
+                
+                List<Posts> postsList = new ArrayList<>();
+                
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    Long usuario = rs.getLong("usuario");
+                    String texto = rs.getString("texto");
+                    String foto = rs.getString("foto");
+                    Date data = rs.getDate("data");
+
+                    Posts post = new Posts(id, usuario, texto, foto, data);
+                    postsList.add(post);
+                }
+                response = Response.ok(postsList).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+        return response;
+    }
+    
+    
     @POST
     @Consumes("application/json;charset=utf-8")   
     @Produces("application/json;charset=utf-8")
