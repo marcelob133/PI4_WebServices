@@ -37,7 +37,7 @@ public class UsersService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
+                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -82,12 +82,12 @@ public class UsersService {
                 ResultSet rs = stmt.executeQuery();
                 
                 if (rs.next()) {
-                    response = Response.ok("Usuario já existe").build();
+                    response = Response.status(406).entity("Usuario já existe").build();
                     return response;
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
-            response = Response.serverError().entity(ex.getMessage()).build();
+            response = Response.status(500).entity(ex.getMessage()).build();
             return response;
         }
 
@@ -117,7 +117,7 @@ public class UsersService {
                 response = Response.ok(usuarioCriado).build();
             }
         } catch (ClassNotFoundException | SQLException ex) {
-            response = Response.serverError().entity("ERRO NO CADASTRO: "+ex.getMessage()).build();
+            response = Response.status(500).entity("ERRO NO CADASTRO: "+ex.getMessage()).build();
         }
 
         return response;
