@@ -71,6 +71,51 @@ public class PostsService {
     }
     
     
+    @GET 
+    @Path("/friends/{id}")  
+    @Produces("application/json;charset=utf-8")
+    public Response getHistoriasDosAmigos (@PathParam("id") Long idUser) throws SQLException {
+    Response response;
+
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                    PreparedStatement stmt = conn.prepareStatement("select usuario2 from amizade where usuario1 = ?")) {
+                
+                if (idUser == 0 || idUser == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+//                
+                stmt.setLong(1, idUser);
+                ResultSet rs = stmt.executeQuery();
+//                
+                List<Long> IdsUsers = new ArrayList<>();
+//                
+                while (rs.next()) {
+                    Long id = rs.getLong("usuario2");
+                    IdsUsers.add(id);
+                }
+                
+                try(PreparedStatement stmt2 = conn.prepareStatement("select usuario1 from amizade where usuario2 = ?")) {
+                    stmt.setLong(1, idUser);
+                    ResultSet rs2 = stmt2.executeQuery();
+    //                
+                    while (rs2.next()) {
+                        Long id = rs.getLong("usuario2");
+                        IdsUsers.add(id);
+                    }
+                    
+                    response = Response.ok(IdsUsers).build();
+                }
+//                response = Response.ok(postsList).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+        return response;
+    }
+    
     @POST
     @Consumes("application/json;charset=utf-8")   
     @Produces("application/json;charset=utf-8")
