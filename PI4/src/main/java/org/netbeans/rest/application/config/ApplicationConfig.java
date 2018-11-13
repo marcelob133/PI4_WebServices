@@ -31,6 +31,7 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(Curtidas.CurtidasService.class);
         resources.add(com.mycompany.pi4.Amigos.FriendsService.class);
+        resources.add(com.mycompany.pi4.Comentarios.CommentService.class);
         resources.add(com.mycompany.pi4.Historicos.PostsService.class);
         resources.add(com.mycompany.pi4.Login.LoginService.class);
         resources.add(com.mycompany.pi4.Usuarios.UsersService.class);

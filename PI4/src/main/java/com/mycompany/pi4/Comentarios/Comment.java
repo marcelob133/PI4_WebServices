@@ -16,15 +16,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Comment implements Serializable {
     private String comment;
-    private int id, usuario, historia;
+    private Long id, usuario, historia;
     private Date data;
 
-    public Comment(String comment, int id, int usuario, int historia, Date data) {
+    public Comment(String comment, Long id, Long usuario, Long historia, Date data) {
         this.comment = comment;
         this.id = id;
         this.usuario = usuario;
         this.historia = historia;
         this.data = data;
+    }
+
+    Comment(Comment comment, Long id, Long usuario, Long historia, java.sql.Date data) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public String getComment() {
@@ -35,27 +39,27 @@ public class Comment implements Serializable {
         this.comment = comment;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getUsuario() {
+    public Long getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(int usuario) {
+    public void setUsuario(Long usuario) {
         this.usuario = usuario;
     }
 
-    public int getHistoria() {
+    public Long getHistoria() {
         return historia;
     }
 
-    public void setHistoria(int historia) {
+    public void setHistoria(Long historia) {
         this.historia = historia;
     }
 
