@@ -10,4 +10,5 @@ com\mycompany\pi4\Usuarios\UsersService.class
 com\mycompany\pi4\Amigos\FriendsService.class
 com\mycompany\pi4\Comentarios\Comment.class
 com\mycompany\pi4\Historicos\PostsService.class
+com\mycompany\pi4\Comentarios\CommentService.class
 Curtidas\CurtidasService.class

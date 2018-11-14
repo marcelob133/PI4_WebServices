@@ -14,6 +14,9 @@ public class Posts {
     private String foto;
     private Date data;
     
+    protected Posts() {
+    }
+    
     public Posts(Long id, Long usuario, String texto, String foto, Date data) {
         this.id = id;
         this.usuario = usuario;

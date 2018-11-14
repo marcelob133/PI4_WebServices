@@ -97,20 +97,24 @@ public class PostsService {
                 }
                 
                 try(PreparedStatement stmt2 = conn.prepareStatement("select usuario1 from amizade where usuario2 = ?")) {
-                    stmt.setLong(1, idUser);
+                    stmt2.setLong(1, idUser);
                     ResultSet rs2 = stmt2.executeQuery();
     //                
                     while (rs2.next()) {
-                        Long id = rs.getLong("usuario2");
+                        Long id = rs2.getLong("usuario1");
                         IdsUsers.add(id);
                     }
                     
+                    
+//                    for(Long id : IdsUsers) {
+//                        try(PreparedStatement stmt = conn.prepareStatement("select usuario1 from amizade where usuario2 = ?"))
+//                    }
+                    
                     response = Response.ok(IdsUsers).build();
                 }
-//                response = Response.ok(postsList).build();
             }
         } catch (ClassNotFoundException | SQLException ex) {
-            response = Response.serverError().entity(ex.getMessage()).build();
+            response = Response.serverError().entity("Erro: " + ex.getMessage()).build();
         }
 
         return response;

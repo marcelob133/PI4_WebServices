@@ -18,7 +18,10 @@ public class Comment implements Serializable {
     private String comment;
     private Long id, usuario, historia;
     private Date data;
-
+    
+    protected Comment() {
+    }
+    
     public Comment(String comment, Long id, Long usuario, Long historia, Date data) {
         this.comment = comment;
         this.id = id;
