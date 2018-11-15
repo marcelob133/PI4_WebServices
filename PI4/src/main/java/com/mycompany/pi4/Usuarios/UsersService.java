@@ -27,6 +27,44 @@ public class UsersService {
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
    
+   @GET
+   @Path("/list/{id}")
+   @Produces("application/json;charset=utf-8")
+    public Response getAllUsers (@PathParam("id") Long idUser){
+        Response response;
+        
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id > 0 and id != ?")) {
+                
+                if (idUser == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idUser);
+                ResultSet rs = stmt.executeQuery();
+                
+                List<Users> usuariosList = new ArrayList<>();
+                
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    String nome = rs.getString("nome");
+                    String email = rs.getString("email");
+                    String senha = rs.getString("senha");
+                    String foto = rs.getString("foto");
+
+                    Users usuario = new Users(id, nome, email, senha, foto);
+                    usuariosList.add(usuario);
+                }
+                response = Response.ok(usuariosList).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+       return response; 
+   }
     
    @GET
    @Path("/{id}")

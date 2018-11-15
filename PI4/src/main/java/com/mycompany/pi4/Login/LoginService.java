@@ -35,8 +35,8 @@ public class LoginService {
             
             try(Connection conn = DriverManager.getConnection(URL,USER,PASS);                
                 PreparedStatement stmt = conn.prepareStatement(sql)){
-                stmt.setString(1, login.getEmail());
-                stmt.setString(2, login.getSenha());
+                stmt.setString(1, login.getEmail().trim());
+                stmt.setString(2, login.getSenha().trim());
                 try(ResultSet rs = stmt.executeQuery()){
                     if(rs.next()){
                        id = rs.getLong("id");

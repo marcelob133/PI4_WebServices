@@ -1,5 +1,5 @@
 
-package Curtidas;
+package com.mycompany.pi4.Curtidas;
 
 public class Curtida {
 
