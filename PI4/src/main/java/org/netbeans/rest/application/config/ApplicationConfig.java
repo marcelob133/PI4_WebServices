@@ -29,10 +29,11 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(com.mycompany.pi4.FriendsService.class);
-        resources.add(com.mycompany.pi4.LoginService.class);
-        resources.add(com.mycompany.pi4.PostsService.class);
-        resources.add(com.mycompany.pi4.UsersService.class);
+        resources.add(com.mycompany.pi4.Amigos.FriendsService.class);
+        resources.add(com.mycompany.pi4.Curtidas.CurtidasService.class);
+        resources.add(com.mycompany.pi4.Historicos.PostsService.class);
+        resources.add(com.mycompany.pi4.Login.LoginService.class);
+        resources.add(com.mycompany.pi4.Usuarios.UsersService.class);
         resources.add(org.glassfish.jersey.server.wadl.internal.WadlResource.class);
     }
     
