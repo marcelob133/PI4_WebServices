@@ -4,8 +4,10 @@ package com.mycompany.pi4.Curtidas;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -19,6 +21,38 @@ public class CurtidasService {
     private static final String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
     private static final String USER = "julio@pijulio";
     private static final String PASS = "Abcd123!";
+    
+    @GET
+    @Path("/{historico}")  
+    @Produces("application/json;charset=utf-8")
+    public Response getQuantidadeCurtidas (@PathParam("historico") Long idHistorico) throws SQLException {
+        Response response;
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("select usuario from curtida where historico = ?")) {
+                
+                if (idHistorico == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idHistorico);
+                
+                ResultSet rs = stmt.executeQuery();
+                int quantidadeCurtidas = 0;
+                
+                while (rs.next()) {
+                    quantidadeCurtidas++;
+                }
+                
+                response = Response.ok(quantidadeCurtidas).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+        return response;       
+    }
     
     @POST
     @Path("/{usuario}/{historico}")
