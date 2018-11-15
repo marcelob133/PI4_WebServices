@@ -5,10 +5,11 @@ com\mycompany\pi4\Login\LoginService.class
 com\mycompany\pi4\Historicos\Posts.class
 com\mycompany\pi4\Amigos\Friend.class
 com\mycompany\pi4\Login\Login.class
+com\mycompany\pi4\Historicos\InsertPost.class
 com\mycompany\pi4\Usuarios\UsersService.class
 com\mycompany\pi4\Amigos\FriendsService.class
 com\mycompany\pi4\Comentarios\Comment.class
 com\mycompany\pi4\Curtidas\CurtidasService.class
 com\mycompany\pi4\Historicos\PostsService.class
+com\mycompany\pi4\Comentarios\CommentService.class
 com\mycompany\pi4\Curtidas\Curtida.class
-.netbeans_automatic_build
