@@ -11,6 +11,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+ import java.util.Comparator;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -65,6 +67,14 @@ public class PostsService {
                     Posts post = new Posts(id, usuario, texto, foto, data, numCurtidas, nomeUser, fotoUser);
                     postsList.add(post);
                 }
+                
+                Collections.sort(postsList, new Comparator<Posts>() {
+                     @Override
+                     public int compare(Posts o1, Posts o2) {
+                         return Long.valueOf(o2.getData().getTime()).compareTo(o1.getData().getTime());
+                     }
+                });
+                
                 response = Response.ok(postsList).build();
             }
         } catch (ClassNotFoundException | SQLException ex) {
@@ -136,7 +146,14 @@ public class PostsService {
                          friendsPosts.addAll(getUserPosts(id));
                      }
                      
-                     response = Response.ok(friendsPosts).build();
+                    Collections.sort(friendsPosts, new Comparator<Posts>() {
+                        @Override
+                        public int compare(Posts o1, Posts o2) {
+                            return Long.valueOf(o2.getData().getTime()).compareTo(o1.getData().getTime());
+                        }
+                    });
+                     
+                    response = Response.ok(friendsPosts).build();
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
