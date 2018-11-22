@@ -1,5 +1,6 @@
 package com.mycompany.pi4.Historicos;
 
+import com.mycompany.pi4.Usuarios.Users;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -40,7 +41,7 @@ public class PostsService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("select * from historia where usuario = ?")) {
+                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, h.foto, h.data, u.nome AS nomeUser, u.foto AS fotoUser FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
                 
                 if (idUser == 0 || idUser == null) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -57,8 +58,11 @@ public class PostsService {
                     String texto = rs.getString("texto");
                     String foto = rs.getString("foto");
                     Date data = rs.getDate("data");
+                    Integer numCurtidas = getPostLikes((int) (long) id);
+                    String nomeUser = rs.getString("nomeUser");
+                    String fotoUser = rs.getString("fotoUser");
 
-                    Posts post = new Posts(id, usuario, texto, foto, data);
+                    Posts post = new Posts(id, usuario, texto, foto, data, numCurtidas, nomeUser, fotoUser);
                     postsList.add(post);
                 }
                 response = Response.ok(postsList).build();
@@ -68,6 +72,29 @@ public class PostsService {
         }
 
         return response;
+    }
+    
+    public Integer getPostLikes(int idPost) {
+        Integer numLikes = 0;
+        
+        try {
+             Class.forName(DRIVER);
+             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                 PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(Curtida.Historico) AS num_curtidas FROM Curtida WHERE Curtida.historico = ?")) {
+                  stmt.setInt(1, idPost);
+                 ResultSet rs = stmt.executeQuery();
+                  if(rs.next()) {
+                     numLikes = rs.getInt("num_curtidas");
+                 } else {
+                     numLikes = 0;
+                 }
+                 
+                 return numLikes;
+             }
+         } catch (ClassNotFoundException | SQLException ex) {
+          }
+        
+        return numLikes;
     }
     
     @GET 
@@ -103,18 +130,52 @@ public class PostsService {
                         IdsUsers.add(id);
                     }
                     
+                     List<Posts> friendsPosts = new ArrayList<>();
                     
-//                    for(Long id : IdsUsers) {
-//                        try(PreparedStatement stmt = conn.prepareStatement("select usuario1 from amizade where usuario2 = ?"))
-//                    }
-                    
-                    response = Response.ok(IdsUsers).build();
+                     for(Long id : IdsUsers) {
+                         friendsPosts.addAll(getUserPosts(id));
+                     }
+                     
+                     response = Response.ok(friendsPosts).build();
                 }
             }
         } catch (ClassNotFoundException | SQLException ex) {
             response = Response.serverError().entity("Erro: " + ex.getMessage()).build();
         }
          return response;
+    }
+    
+    private List<Posts> getUserPosts(Long postId) {
+        
+        List<Posts> posts = new ArrayList<>();
+         try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, h.foto, h.data, u.nome AS nomeUser, u.foto AS fotoUser FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
+ 
+                stmt.setLong(1, postId);
+                ResultSet rs = stmt.executeQuery();
+              
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    Long usuario = rs.getLong("usuario");
+                    String texto = rs.getString("texto");
+                    String foto = rs.getString("foto");
+                    Date data = rs.getDate("data");
+                    Integer numCurtidas = getPostLikes((int) (long) id);
+                    String nomeUser = rs.getString("nomeUser");
+                    String fotoUser = rs.getString("fotoUser");
+                    
+                    Posts post = new Posts(id, usuario, texto, foto, data, numCurtidas, nomeUser, fotoUser);
+                    posts.add(post);
+                }
+                
+                return posts;
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            
+        }
+         return posts;
     }
     
     @POST
