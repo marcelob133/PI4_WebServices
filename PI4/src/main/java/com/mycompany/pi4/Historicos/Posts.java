@@ -13,16 +13,22 @@ public class Posts {
     private String texto;
     private String foto;
     private Date data;
+    private Integer numCurtidas;
+    private String nomeUser;
+    private String fotoUser;
     
     protected Posts(){    
     }
     
-    public Posts(Long id, Long usuario, String texto, String foto, Date data) {
+    public Posts(Long id, Long usuario, String texto, String foto, Date data, Integer numCurtidas, String nomeUser, String fotoUser) {
         this.id = id;
         this.usuario = usuario;
         this.texto = texto;
         this.foto = foto;
         this.data = data;
+        this.numCurtidas = numCurtidas;
+        this.nomeUser = nomeUser;
+        this.fotoUser = fotoUser;
     }
 
     public Long getId() {
@@ -45,6 +51,17 @@ public class Posts {
         return data;
     }
     
+    public Integer getNumCurtidas() {
+        return numCurtidas;
+    }
+    
+    public String getNomeUser() {
+        return nomeUser;
+    }
+    
+    public String getFotoUser() {
+        return fotoUser;
+    }
     
 }
 
