@@ -43,7 +43,7 @@ public class PostsService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, h.foto, h.data, u.nome AS nomeUser, u.foto AS fotoUser FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
+                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, temFoto = CASE WHEN h.foto is null THEN 0 ELSE 1 END, h.data, u.nome AS nomeUser, fotoUser = CASE WHEN u.foto is null THEN 0 ELSE 1 END, h.data FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
                 
                 if (idUser == 0 || idUser == null) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -58,13 +58,14 @@ public class PostsService {
                     Long id = rs.getLong("id");
                     Long usuario = rs.getLong("usuario");
                     String texto = rs.getString("texto");
-                    String foto = rs.getString("foto");
+                    Integer temFoto = rs.getInt("temFoto");
                     Date data = rs.getDate("data");
                     Integer numCurtidas = getPostLikes((int) (long) id);
                     String nomeUser = rs.getString("nomeUser");
-                    String fotoUser = rs.getString("fotoUser");
+                    Integer fotoUser = rs.getInt("fotoUser");
+                    Boolean liked = getLikeStatus(idUser, id);
 
-                    Posts post = new Posts(id, usuario, texto, foto, data, numCurtidas, nomeUser, fotoUser);
+                    Posts post = new Posts(id, usuario, texto, temFoto, data, numCurtidas, nomeUser, fotoUser, liked);
                     postsList.add(post);
                 }
                 
@@ -95,7 +96,7 @@ public class PostsService {
                  ResultSet rs = stmt.executeQuery();
                   if(rs.next()) {
                      numLikes = rs.getInt("num_curtidas");
-                 } else {
+                  } else {
                      numLikes = 0;
                  }
                  
@@ -105,6 +106,30 @@ public class PostsService {
           }
         
         return numLikes;
+    }
+    
+    public Boolean getLikeStatus(Long idUser, Long idPost) {
+        Boolean likeStatus = false;
+        
+        try {
+            Class.forName(DRIVER);
+             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("select * from curtida where usuario = ? AND historico = ?")) {
+                 
+                 stmt.setLong(1, idUser);
+                 stmt.setLong(2, idPost);
+                 
+                 ResultSet rs = stmt.executeQuery();
+                 
+                 if(rs.next()) {
+                    likeStatus = true;
+                 }
+             }
+        } catch (ClassNotFoundException | SQLException ex) {
+          
+        }
+        
+        return likeStatus;
     }
     
     @GET 
@@ -143,7 +168,7 @@ public class PostsService {
                      List<Posts> friendsPosts = new ArrayList<>();
                     
                      for(Long id : IdsUsers) {
-                         friendsPosts.addAll(getUserPosts(id));
+                         friendsPosts.addAll(getUserPosts(id, idUser));
                      }
                      
                     Collections.sort(friendsPosts, new Comparator<Posts>() {
@@ -162,28 +187,29 @@ public class PostsService {
          return response;
     }
     
-    private List<Posts> getUserPosts(Long postId) {
+    public List<Posts> getUserPosts(Long idUser, Long idUserRequest) {
         
         List<Posts> posts = new ArrayList<>();
          try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, h.foto, h.data, u.nome AS nomeUser, u.foto AS fotoUser FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
+                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, temFoto = CASE WHEN h.foto is null THEN 0 ELSE 1 END, h.data, u.nome AS nomeUser, fotoUser = CASE WHEN u.foto is null THEN 0 ELSE 1 END FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
  
-                stmt.setLong(1, postId);
+                stmt.setLong(1, idUser);
                 ResultSet rs = stmt.executeQuery();
               
                 while (rs.next()) {
                     Long id = rs.getLong("id");
                     Long usuario = rs.getLong("usuario");
                     String texto = rs.getString("texto");
-                    String foto = rs.getString("foto");
+                    Integer temFoto = rs.getInt("temFoto");
                     Date data = rs.getDate("data");
                     Integer numCurtidas = getPostLikes((int) (long) id);
                     String nomeUser = rs.getString("nomeUser");
-                    String fotoUser = rs.getString("fotoUser");
+                    Integer fotoUser = rs.getInt("fotoUser");
+                    Boolean liked = getLikeStatus(idUserRequest, id);
                     
-                    Posts post = new Posts(id, usuario, texto, foto, data, numCurtidas, nomeUser, fotoUser);
+                    Posts post = new Posts(id, usuario, texto, temFoto, data, numCurtidas, nomeUser, fotoUser, liked);
                     posts.add(post);
                 }
                 
@@ -268,4 +294,39 @@ public class PostsService {
         
         return response;
     }
+    
+    
+   @GET
+   @Path("/image/{idPost}")
+   @Produces("image/jpeg")
+   public Response getImage (@PathParam("idPost") Long idPost) throws SQLException {
+       Response response;
+
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("select * from historia where id = ?")) {
+                
+                if (idPost == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idPost);
+                ResultSet rs = stmt.executeQuery();
+                
+               
+                
+                while (rs.next()) {                    
+                    byte[] data = rs.getBytes("foto");
+                    response = Response.ok(data).build();
+                    return response;
+                }
+              response = Response.serverError().build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+        return response;
+   }
 }

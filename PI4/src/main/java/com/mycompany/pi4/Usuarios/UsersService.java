@@ -36,7 +36,7 @@ public class UsersService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id > 0 and id != ?")) {
+                PreparedStatement stmt = conn.prepareStatement("select id, nome, email, senha, temFoto = CASE WHEN foto is null  THEN 0 ELSE 1 END from usuario WHERE id != ?")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -52,9 +52,9 @@ public class UsersService {
                     String nome = rs.getString("nome");
                     String email = rs.getString("email");
                     String senha = rs.getString("senha");
-                    String foto = rs.getString("foto");
+                    Integer temFoto = rs.getInt("temFoto");
 
-                    Users usuario = new Users(id, nome, email, senha, foto);
+                    Users usuario = new Users(id, nome, email, senha, temFoto);
                     usuariosList.add(usuario);
                 }
                 response = Response.ok(usuariosList).build();
@@ -75,7 +75,7 @@ public class UsersService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
+                PreparedStatement stmt = conn.prepareStatement("select id, nome, email, senha, temFoto = CASE WHEN foto is null  THEN 0 ELSE 1 END from usuario WHERE id = ?")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -91,9 +91,9 @@ public class UsersService {
                     String nome = rs.getString("nome");
                     String email = rs.getString("email");
                     String senha = rs.getString("senha");
-                    String foto = rs.getString("foto");
+                    Integer temFoto = rs.getInt("temFoto");
 
-                    Users usuario = new Users(id, nome, email, senha, foto);
+                    Users usuario = new Users(id, nome, email, senha, temFoto);
                     usuariosList.add(usuario);
                 }
                 response = Response.ok(usuariosList).build();
@@ -156,6 +156,42 @@ public class UsersService {
             }
         } catch (ClassNotFoundException | SQLException ex) {
             response = Response.status(500).entity("ERRO NO CADASTRO: "+ex.getMessage()).build();
+        }
+
+        return response;
+   }
+   
+   
+   
+   @GET
+   @Path("/image/{idUsuario}")
+   @Produces("image/jpeg")
+   public Response getImage (@PathParam("idUsuario") Long idUser) throws SQLException {
+       Response response;
+
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("select * from usuario where id = ?")) {
+                
+                if (idUser == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idUser);
+                ResultSet rs = stmt.executeQuery();
+                
+               
+                
+                while (rs.next()) {                    
+                    byte[] data = rs.getBytes("foto");
+                    response = Response.ok(data).build();
+                    return response;
+                }
+              response = Response.serverError().build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
         }
 
         return response;
