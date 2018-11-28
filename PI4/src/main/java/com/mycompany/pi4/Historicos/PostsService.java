@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
- import java.util.Comparator;
+import java.util.Comparator;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -177,7 +177,7 @@ public class PostsService {
                             return Long.valueOf(o2.getData().getTime()).compareTo(o1.getData().getTime());
                         }
                     });
-                     
+                    
                     response = Response.ok(friendsPosts).build();
                 }
             }

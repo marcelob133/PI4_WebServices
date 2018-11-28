@@ -17,6 +17,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.Comparator;
 
 @Path("/friends")
 public class FriendsService {
@@ -69,6 +71,19 @@ public class FriendsService {
                     FriendList amizade = new FriendList(id, nome, foto, aprovada);
                     amizadesList.add(amizade);                    
                 }
+                
+                Collections.sort(amizadesList, new Comparator<FriendList>() {
+                    @Override
+                    public int compare(FriendList amizade1, FriendList amizade2) {
+                      if(amizade1.getAprovado() && !amizade2.getAprovado()) {
+                        return 1;
+                      } else if(!amizade1.getAprovado() && amizade2.getAprovado()) {
+                        return -1;
+                      } else {
+                        return 0;
+                      }
+                    }
+                });
                 
                 response = Response.ok(amizadesList).build();
             }
