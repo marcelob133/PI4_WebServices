@@ -85,6 +85,57 @@ public class PostsService {
         return response;
     }
     
+    @GET
+    @Path("/{idUser}/{idFriend}")  
+    @Produces("application/json;charset=utf-8")
+    public Response getHistoriaUser (@PathParam("idUser") Long idUser, @PathParam("idFriend") Long idFriend) throws SQLException {
+        Response response;
+
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                    PreparedStatement stmt = conn.prepareStatement("SELECT h.id, h.usuario, h.texto, temFoto = CASE WHEN h.foto is null THEN 0 ELSE 1 END, h.data, u.nome AS nomeUser, fotoUser = CASE WHEN u.foto is null THEN 0 ELSE 1 END, h.data FROM Historia h INNER JOIN Usuario u ON (h.usuario = u.id) WHERE Usuario = ?")) {
+                
+                if (idUser == 0 || idUser == null) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                
+                stmt.setLong(1, idFriend);
+                ResultSet rs = stmt.executeQuery();
+                
+                List<Posts> postsList = new ArrayList<>();
+                
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    Long usuario = rs.getLong("usuario");
+                    String texto = rs.getString("texto");
+                    Integer temFoto = rs.getInt("temFoto");
+                    Date data = rs.getDate("data");
+                    Integer numCurtidas = getPostLikes((int) (long) id);
+                    String nomeUser = rs.getString("nomeUser");
+                    Integer fotoUser = rs.getInt("fotoUser");
+                    Boolean liked = getLikeStatus(idUser, id);
+
+                    Posts post = new Posts(id, usuario, texto, temFoto, data, numCurtidas, nomeUser, fotoUser, liked);
+                    postsList.add(post);
+                }
+                
+                Collections.sort(postsList, new Comparator<Posts>() {
+                     @Override
+                     public int compare(Posts o1, Posts o2) {
+                         return Long.valueOf(o2.getData().getTime()).compareTo(o1.getData().getTime());
+                     }
+                });
+                
+                response = Response.ok(postsList).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+
+        return response;
+    }
+    
     public Integer getPostLikes(int idPost) {
         Integer numLikes = 0;
         
