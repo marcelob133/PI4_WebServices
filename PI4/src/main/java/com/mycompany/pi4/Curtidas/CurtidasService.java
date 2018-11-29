@@ -54,28 +54,44 @@ public class CurtidasService {
         return response;       
     }
     
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
+    
     @POST
     @Path("/{usuario}/{historico}")
     @Produces("application/json;charset=utf-8")
-    public Response setCurtida(@PathParam("usuario") Long usuarioCurtida, @PathParam("historico") Long historicoCurtida) throws ClassNotFoundException {
+    public Response setCurtida(@PathParam("usuario") Long usuario, @PathParam("historico") Long historico) throws ClassNotFoundException {
         Response response;
         
         Class.forName(DRIVER);
-        String sql = "INSERT INTO curtida (usuario,historico) VALUES (?,?)";
+        String sql = "SELECT * FROM Curtida WHERE usuario = ? AND historico = ?";
         
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
             PreparedStatement stmt = conn.prepareStatement(sql)) {
                 
-            stmt.setLong(1, usuarioCurtida);
-            stmt.setLong(2, historicoCurtida);
+            stmt.setLong(1, usuario);
+            stmt.setLong(2, historico);
                 
-            int rs = stmt.executeUpdate();
-            if(rs != 0){
-                response = Response.ok("Histórico curtido!").build();
-            }else{
-                response = Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA").build();
-            }   
+            ResultSet rs = stmt.executeQuery();
             
+            if(rs.next()) {
+                boolean status = deleteCurtida(usuario, historico);
+                
+                if(status) {
+                    response = Response.ok("Histórico curtido!").build();
+                } else {
+                    Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA").build();
+                }
+            } else {
+                boolean status = createCurtida(usuario, historico);
+                
+                if(status) {
+                    response = Response.ok("Histórico descurtido!").build();
+                } else {
+                    Response.serverError().entity("ERRO AO REMOVER CURTIDA").build();
+                }
+            }
+     
         } catch (SQLException ex) {
             response = Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA: "+ex.getMessage()).build();
         }
@@ -83,35 +99,126 @@ public class CurtidasService {
         return response;
     }
     
-    @DELETE
-    @Path("/{usuario}/{historico}")
-    @Produces("application/json;charset=utf-8")
-       public Response deleteCurtida (@PathParam("usuario") Long usuarioCurtida, @PathParam("historico") Long historicoCurtida) {
-        Response response = null;
+    public boolean createCurtida(Long usuario, Long historico) {
+        boolean status = false;
         
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("DELETE from curtida WHERE usuario = ? and historico = ?")) {
-                if (usuarioCurtida == 0 || historicoCurtida == 0) {
-                    return Response.status(Response.Status.BAD_REQUEST).build();
+                PreparedStatement stmt = conn.prepareStatement("INSERT INTO curtida (usuario,historico) VALUES (?,?)")) {
+                if (usuario == 0 || historico == 0) {
+                    status = false;
                 }
                 
-                stmt.setLong(1, usuarioCurtida);
-                stmt.setLong(2, historicoCurtida);
+                stmt.setLong(1, usuario);
+                stmt.setLong(2, historico);
                 try{
                     stmt.executeUpdate();
-                    response = Response.ok("Curtida desfeita com sucesso!").build();
+                    status = true;
                 }catch(SQLException ex){
-                    response = Response.serverError().entity("Erro durante a execução do delete: " + ex.getMessage()).build();
+                    status = false;
                 }      
             } catch(SQLException ex){
-                response = Response.serverError().entity("Erro durante a conexão e com o banco: " + ex.getMessage()).build();
+                status = false;
             }
         } catch (ClassNotFoundException ex) {
-            response = Response.serverError().entity("Erro no instanciamento da classe Driver: " + ex.getMessage()).build();
+            status = false;
         }
-
-        return response;
+        
+        return status;
     }
+    
+    public boolean deleteCurtida(Long usuario, Long historico) {
+        boolean status = false;
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("DELETE from curtida WHERE usuario = ? and historico = ?")) {
+                if (usuario == 0 || historico == 0) {
+                    status = false;
+                }
+                
+                stmt.setLong(1, usuario);
+                stmt.setLong(2, historico);
+                try{
+                    stmt.executeUpdate();
+                    status = true;
+                }catch(SQLException ex){
+                    status = false;
+                }      
+            } catch(SQLException ex){
+                status = false;
+            }
+        } catch (ClassNotFoundException ex) {
+            status = false;
+        }
+        
+        return status;
+    }
+    
+    /////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    
+    
+//    @POST;
+//    @Path("/{usuario}/{historico}")
+//    @Produces("application/json;charset=utf-8")
+//    public Response setCurtida(@PathParam("usuario") Long usuarioCurtida, @PathParam("historico") Long historicoCurtida) throws ClassNotFoundException {
+//        Response response;
+//        
+//        Class.forName(DRIVER);
+//        String sql = "INSERT INTO curtida (usuario,historico) VALUES (?,?)";
+//        
+//        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+//            PreparedStatement stmt = conn.prepareStatement(sql)) {
+//                
+//            stmt.setLong(1, usuarioCurtida);
+//            stmt.setLong(2, historicoCurtida);
+//                
+//            int rs = stmt.executeUpdate();
+//            if(rs != 0){
+//                response = Response.ok("Histórico curtido!").build();
+//            }else{
+//                response = Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA").build();
+//            }   
+//            
+//        } catch (SQLException ex) {
+//            response = Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA: "+ex.getMessage()).build();
+//        }
+//        
+//        return response;
+//    }
+//    
+//    @DELETE
+//    @Path("/{usuario}/{historico}")
+//    @Produces("application/json;charset=utf-8")
+//       public Response deleteCurtida (@PathParam("usuario") Long usuarioCurtida, @PathParam("historico") Long historicoCurtida) {
+//        Response response = null;
+//        
+//        try {
+//            Class.forName(DRIVER);
+//            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+//                PreparedStatement stmt = conn.prepareStatement("DELETE from curtida WHERE usuario = ? and historico = ?")) {
+//                if (usuarioCurtida == 0 || historicoCurtida == 0) {
+//                    return Response.status(Response.Status.BAD_REQUEST).build();
+//                }
+//                
+//                stmt.setLong(1, usuarioCurtida);
+//                stmt.setLong(2, historicoCurtida);
+//                try{
+//                    stmt.executeUpdate();
+//                    response = Response.ok("Curtida desfeita com sucesso!").build();
+//                }catch(SQLException ex){
+//                    response = Response.serverError().entity("Erro durante a execução do delete: " + ex.getMessage()).build();
+//                }      
+//            } catch(SQLException ex){
+//                response = Response.serverError().entity("Erro durante a conexão e com o banco: " + ex.getMessage()).build();
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            response = Response.serverError().entity("Erro no instanciamento da classe Driver: " + ex.getMessage()).build();
+//        }
+//
+//        return response;
+//    }
 }
