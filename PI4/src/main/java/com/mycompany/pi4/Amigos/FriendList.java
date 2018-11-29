@@ -4,15 +4,16 @@ public class FriendList extends Friend {
     private Long id;
     private String nome;
     private String foto;
+    private Integer temFoto;
     private Boolean aprovado;
     
     protected FriendList() {
     }
         
-    public FriendList(Long id, String nome, String foto, Boolean aprovado) {
+    public FriendList(Long id, String nome, Integer temFoto, Boolean aprovado) {
         this.id = id;
         this.nome = nome;
-        this.foto = foto;
+        this.temFoto = temFoto;
         this.aprovado = aprovado;
     }
 
@@ -27,7 +28,11 @@ public class FriendList extends Friend {
     public String getFoto() {
         return foto;
     }
-
+    
+    public Integer getTemFoto() {
+        return temFoto;
+    }
+    
     public Boolean getAprovado() {
         return aprovado;
     }
@@ -43,10 +48,13 @@ public class FriendList extends Friend {
     public void setFoto(String foto) {
         this.foto = foto;
     }
-
+    
+    public void setTemFoto(Integer temFoto) {
+        this.temFoto = temFoto;
+    }
+    
     public void setAprovado(Boolean aprovado) {
         this.aprovado = aprovado;
     }
-    
     
 }
