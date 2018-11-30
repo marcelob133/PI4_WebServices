@@ -77,7 +77,7 @@ public class CurtidasService {
                 
                 if(status) {
                     Long qtdCurtidas = getQtdCurtidas(historico);
-                    CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
+                    CurtidaResult resultado = new CurtidaResult(false, qtdCurtidas);
                     response = Response.ok(resultado).build();
                 } else {
                     Response.serverError().entity("ERRO AO CURTIR HISTORICO").build();
@@ -87,7 +87,7 @@ public class CurtidasService {
                 
                 if(status) {
                     Long qtdCurtidas = getQtdCurtidas(historico);
-                    CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
+                    CurtidaResult resultado = new CurtidaResult(true, qtdCurtidas);
                     response = Response.ok(resultado).build();
                 } else {
                     Response.serverError().entity("ERRO AO REMOVER CURTIDA").build();
