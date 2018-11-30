@@ -78,7 +78,7 @@ public class CurtidasService {
                 boolean status = deleteCurtida(usuario, historico);
                 
                 if(status) {
-                    Long qtdCurtidas = getQuantidadeCurtidas(historico);
+                    Long qtdCurtidas = getQtdCurtidas(historico);
                     CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
                     response = Response.ok(resultado).build();
                 } else {
@@ -88,7 +88,7 @@ public class CurtidasService {
                 boolean status = createCurtida(usuario, historico);
                 
                 if(status) {
-                    Long qtdCurtidas = getQuantidadeCurtidas(historico);
+                    Long qtdCurtidas = getQtdCurtidas(historico);
                     CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
                     response = Response.ok(resultado).build();
                 } else {
@@ -101,6 +101,29 @@ public class CurtidasService {
         }
         
         return response;
+    }
+    
+    public Long getQtdCurtidas(Long idHistorico) {
+        long qtdCurtida = 0;
+        try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("SELECT	COUNT(historico) AS numLikes FROM Curtida WHERE historico = 5")) {
+                stmt.setLong(1, idHistorico);
+                
+                ResultSet rs = stmt.executeQuery();
+                int quantidadeCurtidas = 0;
+                
+                while (rs.next()) {
+                    qtdCurtida = rs.getLong("numLikes");
+                    return qtdCurtida;
+                }
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            return qtdCurtida;
+        }
+
+        return qtdCurtida;     
     }
     
     public boolean createCurtida(Long usuario, Long historico) {
