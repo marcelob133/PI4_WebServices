@@ -78,15 +78,19 @@ public class CurtidasService {
                 boolean status = deleteCurtida(usuario, historico);
                 
                 if(status) {
-                    response = Response.ok("Histórico curtido!").build();
+                    Long qtdCurtidas = getQuantidadeCurtidas(historico);
+                    CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
+                    response = Response.ok(resultado).build();
                 } else {
-                    Response.serverError().entity("ERRO NO CADASTRO DA CURTIDA").build();
+                    Response.serverError().entity("ERRO AO CURTIR HISTORICO").build();
                 }
             } else {
                 boolean status = createCurtida(usuario, historico);
                 
                 if(status) {
-                    response = Response.ok("Histórico descurtido!").build();
+                    Long qtdCurtidas = getQuantidadeCurtidas(historico);
+                    CurtidaResult resultado = new CurtidaResult(status, qtdCurtidas);
+                    response = Response.ok(resultado).build();
                 } else {
                     Response.serverError().entity("ERRO AO REMOVER CURTIDA").build();
                 }
