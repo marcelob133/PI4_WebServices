@@ -141,9 +141,15 @@ public class UsersService {
                 stmt.setString(2, user.getEmail());
                 stmt.setString(3, user.getSenha());
                 String foto = user.getFoto();
-                byte[] fotoEmByte = Base64.getDecoder().decode (foto);
                 
-                stmt.setBytes(4, fotoEmByte);
+                if(foto.equals(null) || foto.equals("")){
+                    byte[] fotoEmByte = null;
+                    stmt.setBytes(4, fotoEmByte);
+                }else{
+                    byte[] fotoEmByte = Base64.getDecoder().decode (foto);
+                    stmt.setBytes(4, fotoEmByte);                    
+                }
+
                 
                 int rs = stmt.executeUpdate();
                 
