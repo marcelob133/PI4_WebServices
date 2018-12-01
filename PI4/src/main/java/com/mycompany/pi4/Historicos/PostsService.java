@@ -290,8 +290,14 @@ public class PostsService {
                 stmt.setString(2, post.getTexto());
         
                 String foto = post.getFoto();
-                byte[] fotoEmByte = Base64.getDecoder().decode (foto);
-                stmt.setBytes(3, fotoEmByte);            
+                
+                if(foto.equals(null) || foto.equals("")){
+                    byte[] fotoEmByte = null;     
+                    stmt.setBytes(3, fotoEmByte);
+                }else{
+                    byte[] fotoEmByte = Base64.getDecoder().decode (foto);
+                    stmt.setBytes(3, fotoEmByte);
+                }          
                 
                 java.sql.Date d = new java.sql.Date (new java.util.Date().getTime());
                 stmt.setDate (4,d);
