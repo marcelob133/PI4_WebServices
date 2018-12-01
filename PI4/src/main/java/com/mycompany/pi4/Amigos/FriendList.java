@@ -5,20 +5,30 @@ public class FriendList extends Friend {
     private String nome;
     private String foto;
     private Integer temFoto;
+    private String statusAmizade;
     private Boolean aprovado;
     
     protected FriendList() {
     }
         
-    public FriendList(Long id, String nome, Integer temFoto, Boolean aprovado) {
+    public FriendList(Long id, String nome, Integer temFoto, String statusAmizade, Boolean aprovado) {
         this.id = id;
         this.nome = nome;
         this.temFoto = temFoto;
         this.aprovado = aprovado;
+        
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getStatusAmizade() {
+        return statusAmizade;
+    }
+
+    public void setStatusAmizade(String statusAmizade) {
+        this.statusAmizade = statusAmizade;
     }
 
     public String getNome() {
@@ -48,6 +58,7 @@ public class FriendList extends Friend {
     public void setFoto(String foto) {
         this.foto = foto;
     }
+    
     
     public void setTemFoto(Integer temFoto) {
         this.temFoto = temFoto;

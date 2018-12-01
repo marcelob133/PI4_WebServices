@@ -54,8 +54,14 @@ public class FriendsService {
                     String nome = rs.getString("nome"); 
                     Integer temFoto = rs.getInt("temFoto");
                     Boolean aprovada = rs.getBoolean("aprovada");
+                    String statusAmizade = "";
                     
-                    FriendList amizade = new FriendList(id, nome, temFoto, aprovada);
+                    if(aprovada){
+                        statusAmizade = "amigos";
+                    }else{
+                        statusAmizade = "solicitado";
+                    }
+                    FriendList amizade = new FriendList(id, nome, temFoto, statusAmizade, aprovada);
                     amizadesList.add(amizade);
                 }
                 
@@ -67,8 +73,14 @@ public class FriendsService {
                     String nome = rsInverted.getString("nome");
                     Integer temFoto = rsInverted.getInt("temFoto");
                     Boolean aprovada = rsInverted.getBoolean("aprovada");
+                    String statusAmizade = "";
                     
-                    FriendList amizade = new FriendList(id, nome, temFoto, aprovada);
+                    if(aprovada){
+                        statusAmizade = "amigos";
+                    }else{
+                        statusAmizade = "solicitante";
+                    }
+                    FriendList amizade = new FriendList(id, nome, temFoto, statusAmizade, aprovada);
                     amizadesList.add(amizade);                    
                 }
                 
