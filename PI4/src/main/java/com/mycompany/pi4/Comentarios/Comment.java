@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Comment implements Serializable {
     private String comment;
-    private Long id, usuario, historia;
+    private Long id, usuario, historico;
     private Date data;
 
     protected Comment() {
@@ -18,7 +18,7 @@ public class Comment implements Serializable {
         this.comment = comment;
         this.id = id;
         this.usuario = usuario;
-        this.historia = historia;
+        this.historico = historia;
         this.data = data;
     }
     
@@ -50,12 +50,12 @@ public class Comment implements Serializable {
         this.usuario = usuario;
     }
 
-    public Long getHistoria() {
-        return historia;
+    public Long getHistorico() {
+        return historico;
     }
 
-    public void setHistoria(Long historia) {
-        this.historia = historia;
+    public void setHistorico(Long historico) {
+        this.historico = historico;
     }
 
     public Date getData() {

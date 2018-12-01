@@ -31,7 +31,7 @@ public class LoginService {
                
         try{
             Class.forName(DRIVER);
-            String sql = "select * from usuario where email = ? and senha = ?";
+            String sql = "select id, nome, email, senha, temFoto = CASE WHEN foto is null  THEN 0 ELSE 1 END from usuario WHERE email = ? AND senha = ?";
             
             try(Connection conn = DriverManager.getConnection(URL,USER,PASS);                
                 PreparedStatement stmt = conn.prepareStatement(sql)){
@@ -43,7 +43,7 @@ public class LoginService {
                        String nome = rs.getString("nome");
                        String email = rs.getString("email");
                        String senha = rs.getString("senha");
-                       String foto = rs.getString("foto");
+                       Integer foto = rs.getInt("temFoto");
                        
                        Users usuario = new Users(id, nome, email, senha, foto);
                        response = Response.ok(usuario).build();

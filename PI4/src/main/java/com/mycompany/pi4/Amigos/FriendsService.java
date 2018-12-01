@@ -17,6 +17,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.Comparator;
 
 @Path("/friends")
 public class FriendsService {
@@ -35,8 +37,8 @@ public class FriendsService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("SELECT Usuario.id, Usuario.nome , Usuario.foto, Amizade.aprovada FROM Amizade INNER JOIN Usuario ON Amizade.usuario1 = Usuario.id WHERE Amizade.usuario2 = ?");
-                PreparedStatement stmtInverted = conn.prepareStatement("SELECT Usuario.id, Usuario.nome, Usuario.foto, Amizade.aprovada FROM Amizade INNER JOIN Usuario ON Amizade.usuario2 = Usuario.id WHERE Amizade.usuario1 = ?");    
+                PreparedStatement stmt = conn.prepareStatement("SELECT Usuario.id, Usuario.nome , temFoto = CASE WHEN Usuario.foto is null THEN 0 ELSE 1 END, Amizade.aprovada FROM Amizade INNER JOIN Usuario ON Amizade.usuario1 = Usuario.id WHERE Amizade.usuario2 = ?");
+                PreparedStatement stmtInverted = conn.prepareStatement("SELECT Usuario.id, Usuario.nome, temFoto = CASE WHEN Usuario.foto is null THEN 0 ELSE 1 END, Amizade.aprovada FROM Amizade INNER JOIN Usuario ON Amizade.usuario2 = Usuario.id WHERE Amizade.usuario1 = ?");    
             ) {
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -50,10 +52,16 @@ public class FriendsService {
                 while (rs.next()) {
                     Long id = rs.getLong("id");
                     String nome = rs.getString("nome"); 
-                    String foto = rs.getString("foto");
+                    Integer temFoto = rs.getInt("temFoto");
                     Boolean aprovada = rs.getBoolean("aprovada");
+                    String statusAmizade = "";
                     
-                    FriendList amizade = new FriendList(id, nome, foto, aprovada);
+                    if(aprovada){
+                        statusAmizade = "amigos";
+                    }else{
+                        statusAmizade = "solicitado";
+                    }
+                    FriendList amizade = new FriendList(id, nome, temFoto, statusAmizade, aprovada);
                     amizadesList.add(amizade);
                 }
                 
@@ -63,12 +71,31 @@ public class FriendsService {
                 while (rsInverted.next()) {
                     Long id = rsInverted.getLong("id");
                     String nome = rsInverted.getString("nome");
-                    String foto = rsInverted.getString("foto");
+                    Integer temFoto = rsInverted.getInt("temFoto");
                     Boolean aprovada = rsInverted.getBoolean("aprovada");
+                    String statusAmizade = "";
                     
-                    FriendList amizade = new FriendList(id, nome, foto, aprovada);
+                    if(aprovada){
+                        statusAmizade = "amigos";
+                    }else{
+                        statusAmizade = "solicitante";
+                    }
+                    FriendList amizade = new FriendList(id, nome, temFoto, statusAmizade, aprovada);
                     amizadesList.add(amizade);                    
                 }
+                
+                Collections.sort(amizadesList, new Comparator<FriendList>() {
+                    @Override
+                    public int compare(FriendList amizade1, FriendList amizade2) {
+                      if(amizade1.getAprovado() && !amizade2.getAprovado()) {
+                        return 1;
+                      } else if(!amizade1.getAprovado() && amizade2.getAprovado()) {
+                        return -1;
+                      } else {
+                        return 0;
+                      }
+                    }
+                });
                 
                 response = Response.ok(amizadesList).build();
             }

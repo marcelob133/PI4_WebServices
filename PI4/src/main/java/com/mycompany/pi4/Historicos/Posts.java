@@ -12,23 +12,26 @@ public class Posts {
     private Long usuario;
     private String texto;
     private String foto;
+    private Integer temFoto;
     private Date data;
     private Integer numCurtidas;
     private String nomeUser;
-    private String fotoUser;
+    private Integer fotoUser;
+    private Boolean liked;
     
     protected Posts(){    
     }
     
-    public Posts(Long id, Long usuario, String texto, String foto, Date data, Integer numCurtidas, String nomeUser, String fotoUser) {
+    public Posts(Long id, Long usuario, String texto, Integer temFoto, Date data, Integer numCurtidas, String nomeUser, Integer fotoUser, Boolean liked) {
         this.id = id;
         this.usuario = usuario;
         this.texto = texto;
-        this.foto = foto;
+        this.temFoto = temFoto;
         this.data = data;
         this.numCurtidas = numCurtidas;
         this.nomeUser = nomeUser;
         this.fotoUser = fotoUser;
+        this.liked = liked;
     }
 
     public Long getId() {
@@ -59,8 +62,20 @@ public class Posts {
         return nomeUser;
     }
     
-    public String getFotoUser() {
+    public Integer getFotoUser() {
         return fotoUser;
+    }
+    
+    public Boolean getLiked() {
+        return liked;
+    }
+    
+    public Integer getTemFoto() {
+        return temFoto;
+    }
+    
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
     
 }
