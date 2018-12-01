@@ -56,10 +56,10 @@ public class CommentService {
                     String texto = rs.getString("texto");
                     Long id = rs.getLong("id");
                     Long usuario = rs.getLong("usuario");
-                    Long historia = rs.getLong("historia");
+                    Long historico = rs.getLong("historico");
                     Date data = rs.getDate("data");
                     
-                    Comment  comment = new Comment(texto, id, usuario, historia, data);
+                    Comment  comment = new Comment(texto, id, usuario, historico, data);
                     commentsList.add(comment);
                 }
                 response = Response.ok(commentsList).build();
@@ -88,7 +88,7 @@ public class CommentService {
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                                
                 stmt.setLong(1, comment.getUsuario());
-                stmt.setLong(2, comment.getHistoria());
+                stmt.setLong(2, comment.getHistorico());
                 stmt.setString(3, comment.getComment());
                 
                 java.sql.Date d = new java.sql.Date (new java.util.Date().getTime());
