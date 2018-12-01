@@ -171,15 +171,17 @@ public class UsersService {
        try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("SELECT u.id, u.nome, u.email, u.senha, temFoto = CASE WHEN u.foto is null THEN 0 ELSE 1 END, amizade = CASE WHEN a.aprovada is null THEN 2 ELSE a.aprovada END FROM Usuario u LEFT JOIN Amizade a ON u.id = a.usuario1 OR u.id = a.usuario2 WHERE (u.nome LIKE ? OR u.email LIKE ?) AND id != ? ORDER BY aprovada")) {
+                PreparedStatement stmt = conn.prepareStatement("SELECT u.id, u.nome, u.email, u.senha, temFoto = CASE WHEN u.foto is null THEN 0 ELSE 1 END, amizade = CASE WHEN a.aprovada = 1  THEN 'amigos' WHEN a.aprovada = 0 AND a.usuario1 = ? THEN 'solicitante' WHEN a.aprovada = 0 AND a.usuario2 = ? THEN 'solicitado' ELSE null END FROM Usuario u  LEFT JOIN Amizade a ON u.id = a.usuario1 OR u.id = a.usuario2 WHERE (u.nome LIKE ? OR u.email LIKE ?) AND id != ? ORDER BY aprovada")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
+                stmt.setLong(1, idUser);
+                stmt.setLong(2, idUser);
+                stmt.setString(3, "%" + query + "%");
+                stmt.setString(4, "%" + query + "%");
+                stmt.setLong(5, idUser);
                 
-                stmt.setString(1, "%" + query + "%");
-                stmt.setString(2, "%" + query + "%");
-                stmt.setLong(3, idUser);
                 ResultSet rs = stmt.executeQuery();
                 
                 List<Users> usuariosList = new ArrayList<>();
@@ -190,7 +192,7 @@ public class UsersService {
                     String email = rs.getString("email");
                     String senha = rs.getString("senha");
                     Integer temFoto = rs.getInt("temFoto");
-                    Integer amizade = rs.getInt("amizade");
+                    String amizade = rs.getString("amizade");
 
                     Users usuario = new Users(id, nome, email, senha, temFoto, amizade);
                     usuariosList.add(usuario);

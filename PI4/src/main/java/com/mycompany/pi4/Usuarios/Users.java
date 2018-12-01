@@ -12,7 +12,7 @@ public class Users implements Serializable {
     private String senha;
     private String foto;
     private Integer temFoto;
-    private Integer amizade;
+    private String amizade;
 
     protected Users() {
     }
@@ -25,7 +25,7 @@ public class Users implements Serializable {
         this.temFoto = temFoto;
     }
     
-    public Users(Long id, String nome, String email, String senha, Integer temFoto, Integer amizade) {
+    public Users(Long id, String nome, String email, String senha, Integer temFoto, String amizade) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -60,11 +60,11 @@ public class Users implements Serializable {
         this.foto = foto;
     }
     
-    public Integer getAmizade() {
+    public String getAmizade() {
         return amizade;
     }
     
-    public void setAmizade(Integer amizade) {
+    public void setAmizade(String amizade) {
         this.amizade = amizade;
     }
 
