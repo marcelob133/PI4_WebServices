@@ -2,6 +2,7 @@ com\mycompany\pi4\Amigos\FriendList.class
 com\mycompany\pi4\Usuarios\Users.class
 org\netbeans\rest\application\config\ApplicationConfig.class
 com\mycompany\pi4\Historicos\PostsService$3.class
+com\mycompany\pi4\Curtidas\CurtidaResult.class
 com\mycompany\pi4\Login\LoginService.class
 com\mycompany\pi4\Historicos\Posts.class
 com\mycompany\pi4\Amigos\Friend.class

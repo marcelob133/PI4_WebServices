@@ -12,6 +12,7 @@ public class Users implements Serializable {
     private String senha;
     private String foto;
     private Integer temFoto;
+    private Integer amizade;
 
     protected Users() {
     }
@@ -22,6 +23,14 @@ public class Users implements Serializable {
         this.email = email;
         this.senha = senha;
         this.temFoto = temFoto;
+    }
+    
+    public Users(Long id, String nome, String email, String senha, Integer temFoto, Integer amizade) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.temFoto = temFoto;
+        this.amizade = amizade;
     }
 
     public Long getId() {
@@ -49,6 +58,14 @@ public class Users implements Serializable {
     
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+    
+    public Integer getAmizade() {
+        return amizade;
+    }
+    
+    public void setAmizade(Integer amizade) {
+        this.amizade = amizade;
     }
 
 }

@@ -31,7 +31,7 @@ public class PostsService {
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String URL = "jdbc:sqlserver://pijulio.database.windows.net:1433;database=facenac";
     private static final String USER = "julio@pijulio";
-    private static final String PASS = "Abcd123!";
+        private static final String PASS = "Abcd123!";
    
     
     @GET
@@ -302,12 +302,14 @@ public class PostsService {
                     if (generatedKeys.next()) {
                         postCriado = generatedKeys.getLong(1);
                     }
+                } catch(Exception e) {
+                    response = Response.serverError().entity("ERRO NO CADASTRO: "+e.getMessage()).build();
                 }
                 
                 response = Response.ok(postCriado).build();
             }
-        } catch (ClassNotFoundException | SQLException ex) {
-            response = Response.serverError().entity("ERRO NO CADASTRO: "+ex.getMessage()).build();
+        } catch (Exception ex) {
+            response = Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
         }
         
         return response;
