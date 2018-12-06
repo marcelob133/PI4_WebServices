@@ -16,7 +16,7 @@ public class FriendList extends Friend {
         this.nome = nome;
         this.temFoto = temFoto;
         this.aprovado = aprovado;
-        
+        this.statusAmizade = statusAmizade;
     }
 
     public Long getId() {
