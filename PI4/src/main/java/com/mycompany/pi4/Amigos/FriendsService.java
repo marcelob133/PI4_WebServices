@@ -142,6 +142,8 @@ public class FriendsService {
     @Produces("application/json;charset=utf-8")
        public Response deleteAmigo (@PathParam("idUsuario") Long idUsuario, @PathParam("idAmigo") Long idAmigo) {
         Response response = null;
+        Mensagem msg = new Mensagem(); 
+       
         
         try {
             Class.forName(DRIVER);
@@ -155,7 +157,8 @@ public class FriendsService {
                 stmt.setLong(2, idUsuario);
                 try{
                     stmt.executeUpdate();
-                    response = Response.ok("Amizade desfeita com sucesso!").build();
+                    msg.setMensagem("Amizade desfeita com sucesso!");
+                    response = Response.ok(msg).build();
                 }catch(SQLException ex){
                     response = Response.serverError().entity(ex.getMessage()).build();
                 }      
@@ -173,6 +176,7 @@ public class FriendsService {
     @Produces("application/json;charset=utf-8")
     public Response updateAmizade (Friend friend) throws SQLException, ClassNotFoundException {
         Response response;
+        Mensagem msg = new Mensagem();
 
         Class.forName(DRIVER);
         String sql = "UPDATE amizade SET aprovada = ? WHERE usuario1 = ? and usuario2 = ?";
@@ -186,7 +190,8 @@ public class FriendsService {
                 
             int rs = stmt.executeUpdate();
             if(rs != 0){
-                response = Response.ok("Amizade aceita e gravada no banco!").build();
+                msg.setMensagem("Amizade desfeita com sucesso!");
+                response = Response.ok(msg).build();
             }else{
                 response = Response.status(500).entity("ERRO NO UPDATE DA AMIZADE").build();
             }   
