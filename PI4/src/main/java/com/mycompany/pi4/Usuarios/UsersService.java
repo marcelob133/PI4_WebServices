@@ -177,7 +177,7 @@ public class UsersService {
        try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("SELECT u.id, u.nome, u.email, u.senha, temFoto = CASE WHEN u.foto is null THEN 0 ELSE 1 END, amizade = CASE WHEN a.aprovada = 1  THEN 'amigos' WHEN a.aprovada = 0 AND a.usuario1 = ? THEN 'solicitante' WHEN a.aprovada = 0 AND a.usuario2 = ? THEN 'solicitado' ELSE null END FROM Usuario u  LEFT JOIN Amizade a ON u.id = a.usuario1 OR u.id = a.usuario2 WHERE id != ? ORDER BY aprovada")) {
+                PreparedStatement stmt = conn.prepareStatement("SELECT distinct u.id, u.nome, u.email, u.senha, temFoto = CASE WHEN u.foto is null THEN 0 ELSE 1 END, amizade = CASE WHEN a.aprovada = 1  THEN 'amigos' WHEN a.aprovada = 0 AND a.usuario1 = ? THEN 'solicitante' WHEN a.aprovada = 0 AND a.usuario2 = ? THEN 'solicitado' ELSE null END FROM Usuario u  LEFT JOIN Amizade a ON u.id = a.usuario1 OR u.id = a.usuario2 WHERE id != ? ORDER BY amizade desc")) {
                 
                 if (idUser == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
