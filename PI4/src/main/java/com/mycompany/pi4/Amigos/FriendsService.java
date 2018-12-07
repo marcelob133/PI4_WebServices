@@ -148,17 +148,23 @@ public class FriendsService {
         try {
             Class.forName(DRIVER);
             try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
-                PreparedStatement stmt = conn.prepareStatement("delete from amizade where usuario1 = ? and usuario2 = ?")) {
+                PreparedStatement stmt = conn.prepareStatement("delete from amizade where (usuario1 = ? and usuario2 = ?) OR (usuario1 = ? and usuario2 =?)")) {
                 if (idUsuario == 0 || idAmigo == 0) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
                 
                 stmt.setLong(1, idAmigo);
                 stmt.setLong(2, idUsuario);
+                stmt.setLong(3, idUsuario);
+                stmt.setLong(4, idAmigo);
                 try{
-                    stmt.executeUpdate();
-                    msg.setMensagem("Amizade desfeita com sucesso!");
-                    response = Response.ok(msg).build();
+                    int rs = stmt.executeUpdate();
+                    
+                    if(rs != 0) {
+                        msg.setMensagem("Amizade desfeita com sucesso!");
+                        response = Response.ok(msg).build();
+                    }
+                    
                 }catch(SQLException ex){
                     response = Response.serverError().entity(ex.getMessage()).build();
                 }      
