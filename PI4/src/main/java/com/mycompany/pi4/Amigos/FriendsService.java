@@ -20,6 +20,9 @@ import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.Comparator;
 
+//PI4facenac\Rodrigo__Limas
+//ftp://waws-prod-cq1-011.ftp.azurewebsites.windows.net
+
 @Path("/friends")
 public class FriendsService {
     
@@ -112,6 +115,7 @@ public class FriendsService {
     @Produces("application/json;charset=utf-8")
     public Response setAmizade (Friend friend) throws SQLException, ClassNotFoundException {
         Response response;
+        Mensagem msg = new Mensagem();
         
         Class.forName(DRIVER);
         String sql = "INSERT INTO amizade (usuario1,usuario2,aprovada) VALUES (?,?,?)";
@@ -125,7 +129,8 @@ public class FriendsService {
                 
             int rs = stmt.executeUpdate();
             if(rs != 0){
-                response = Response.ok("Amizade solicitada!").build();
+                msg.setMensagem("Amizade solicitada!");
+                response = Response.ok(msg).build();
             }else{
                 response = Response.serverError().entity("ERRO NO CADASTRO DE AMIZADE").build();
             }   
