@@ -110,10 +110,54 @@ public class FriendsService {
    }
     
     
-    @POST
-    @Consumes("application/json;charset=utf-8")   
+    @GET
+    @Path("all/{id}")
     @Produces("application/json;charset=utf-8")
-    public Response setAmizade (Friend friend) throws SQLException, ClassNotFoundException {
+    public Response getFriendsAndUsers(@PathParam("id") Long idUser) {
+    
+        Response response = null;
+       
+       try {
+            Class.forName(DRIVER);
+            try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+                PreparedStatement stmt = conn.prepareStatement("SELECT u.id, u.nome, u.email, u.senha, temFoto = CASE WHEN u.foto is null THEN 0 ELSE 1 END, amizade = CASE WHEN a.aprovada = 1  THEN 'amigos' WHEN a.aprovada = 0 AND a.usuario1 = ? THEN 'solicitante' WHEN a.aprovada = 0 AND a.usuario2 = ? THEN 'solicitado' ELSE null END FROM Usuario u  LEFT JOIN Amizade a ON u.id = a.usuario1 OR u.id = a.usuario2 WHERE id != ? ORDER BY aprovada")) {
+                
+                if (idUser == 0) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                stmt.setLong(1, idUser);
+                stmt.setLong(2, idUser);
+                stmt.setLong(3, idUser);
+                
+                ResultSet rs = stmt.executeQuery();
+                
+                List<FriendList> amizadesList = new ArrayList<>();
+                
+                while (rs.next()) {
+                    Long id = rs.getLong("id");
+                    String nome = rs.getString("nome");
+                    Integer temFoto = rs.getInt("temFoto");
+                    Boolean aprovada = rs.getBoolean("amizade");
+                    String statusAmizade = null;
+
+                    FriendList amizade = new FriendList(id, nome, temFoto, statusAmizade, aprovada);
+                    amizadesList.add(amizade);
+                }
+                response = Response.ok(amizadesList).build();
+            }
+        } catch (ClassNotFoundException | SQLException ex) {
+            response = Response.serverError().entity(ex.getMessage()).build();
+        }
+       
+       return response;
+        
+    }
+    
+    
+    @POST
+    @Path("/{idUsuario}/{idAmigo}")  
+    @Produces("application/json;charset=utf-8")
+    public Response setAmizade (@PathParam("idUsuario") Long idUsuario, @PathParam("idAmigo") Long idAmigo) throws SQLException, ClassNotFoundException {
         Response response;
         Mensagem msg = new Mensagem();
         
@@ -123,8 +167,8 @@ public class FriendsService {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
             PreparedStatement stmt = conn.prepareStatement(sql)) {
                 
-            stmt.setLong(1, friend.getUsuario1());
-            stmt.setLong(2, friend.getUsuario2());
+            stmt.setLong(1, idUsuario);
+            stmt.setLong(2, idAmigo);
             stmt.setBoolean(3, false);
                 
             int rs = stmt.executeUpdate();
