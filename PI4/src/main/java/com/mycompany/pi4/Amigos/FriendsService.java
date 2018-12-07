@@ -177,10 +177,11 @@ public class FriendsService {
 
         return response;
     }
+       
     @PUT
-    @Consumes("application/json;charset=utf-8")   
+    @Path("/{idUsuario}/{idAmigo}")
     @Produces("application/json;charset=utf-8")
-    public Response updateAmizade (Friend friend) throws SQLException, ClassNotFoundException {
+    public Response updateAmizade (@PathParam("idUsuario") Long idUsuario, @PathParam("idAmigo") Long idAmigo) throws SQLException, ClassNotFoundException {
         Response response;
         Mensagem msg = new Mensagem();
 
@@ -191,12 +192,12 @@ public class FriendsService {
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setBoolean(1, true);
-            stmt.setLong(2, friend.getUsuario1());
-            stmt.setLong(3, friend.getUsuario2());
+            stmt.setLong(2, idAmigo);
+            stmt.setLong(3, idUsuario);
                 
             int rs = stmt.executeUpdate();
             if(rs != 0){
-                msg.setMensagem("Amizade desfeita com sucesso!");
+                msg.setMensagem("Pedido de amizade aceito!");
                 response = Response.ok(msg).build();
             }else{
                 response = Response.status(500).entity("ERRO NO UPDATE DA AMIZADE").build();
